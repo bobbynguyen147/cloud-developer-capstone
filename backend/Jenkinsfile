@@ -1,0 +1,37 @@
+pipeline {
+	agent any
+	stages {
+        dir('backend') {
+            stage('Build') {
+                steps {
+                    sh '''
+                        node --version
+                        npm update --save
+                        npm audit fix
+                    '''
+                }
+            }
+
+            stage('Login Serverless') {
+                steps {
+                    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'aws_credentials', usernameVariable: 'ACCESS_KEY_ID', passwordVariable: 'SECRET_KEY']]){
+                        sh '''
+                            serverless login
+                            sls config credentials --provider aws --key ACCESS_KEY_ID --secret SECRET_KEY --profile serverless
+                        '''
+                    }
+                }
+            }
+
+            stage('Deploy') {
+                steps {
+                    withAWS(region:'us-east-1', credentials:'aws_credentials') {
+                        sh '''
+                            serverless deploy --verbose
+                        '''
+                    }
+                }
+            }
+        }
+	}
+}
