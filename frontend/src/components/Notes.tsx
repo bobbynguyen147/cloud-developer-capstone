@@ -14,91 +14,91 @@ import {
   Loader
 } from 'semantic-ui-react'
 
-import { createTodo, deleteTodo, getTodos, patchTodo } from '../api/todos-api'
+import { createNote, deleteNote, getNotes, patchNote } from '../api/notes-api'
 import Auth from '../auth/Auth'
-import { Todo } from '../types/Todo'
+import { Note } from '../types/Note'
 
-interface TodosProps {
+interface NotesProps {
   auth: Auth
   history: History
 }
 
-interface TodosState {
-  todos: Todo[]
-  newTodoName: string
-  loadingTodos: boolean
+interface NotesState {
+  notes: Note[]
+  newNoteName: string
+  loadingNotes: boolean
 }
 
-export class Todos extends React.PureComponent<TodosProps, TodosState> {
-  state: TodosState = {
-    todos: [],
-    newTodoName: '',
-    loadingTodos: true
+export class Notes extends React.PureComponent<NotesProps, NotesState> {
+  state: NotesState = {
+    notes: [],
+    newNoteName: '',
+    loadingNotes: true
   }
 
   handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ newTodoName: event.target.value })
+    this.setState({ newNoteName: event.target.value })
   }
 
-  onEditButtonClick = (todoId: string) => {
-    this.props.history.push(`/todos/${todoId}/edit`)
+  onEditButtonClick = (noteId: string) => {
+    this.props.history.push(`/notes/${noteId}/edit`)
   }
 
-  onTodoCreate = async (event: React.ChangeEvent<HTMLButtonElement>) => {
+  onNoteCreate = async (event: React.ChangeEvent<HTMLButtonElement>) => {
     try {
       const dueDate = this.calculateDueDate()
-      const newTodo = await createTodo(this.props.auth.getIdToken(), {
-        name: this.state.newTodoName,
+      const newNote = await createNote(this.props.auth.getIdToken(), {
+        name: this.state.newNoteName,
         dueDate
       })
       this.setState({
-        todos: [...this.state.todos, newTodo],
-        newTodoName: ''
+        notes: [...this.state.notes, newNote],
+        newNoteName: ''
       })
     } catch {
-      alert('Todo creation failed')
+      alert('Note creation failed')
     }
   }
 
-  onTodoDelete = async (todoId: string) => {
+  onNoteDelete = async (noteId: string) => {
     try {
-      await deleteTodo(this.props.auth.getIdToken(), todoId)
+      await deleteNote(this.props.auth.getIdToken(), noteId)
       this.setState({
-        todos: this.state.todos.filter(todo => todo.todoId !== todoId)
+        notes: this.state.notes.filter(note => note.noteId !== noteId)
       })
     } catch {
-      alert('Todo deletion failed')
+      alert('Note deletion failed')
     }
   }
 
-  onTodoCheck = async (pos: number) => {
+  onNoteCheck = async (pos: number) => {
     try {
-      const todo = this.state.todos[pos]
-      await patchTodo(this.props.auth.getIdToken(), todo.todoId, {
-        name: todo.name,
-        dueDate: todo.dueDate,
-        done: !todo.done
+      const note = this.state.notes[pos]
+      await patchNote(this.props.auth.getIdToken(), note.noteId, {
+        name: note.name,
+        dueDate: note.dueDate,
+        done: !note.done
       })
       this.setState({
-        todos: update(this.state.todos, {
-          [pos]: { done: { $set: !todo.done } }
+        notes: update(this.state.notes, {
+          [pos]: { done: { $set: !note.done } }
         })
       })
     } catch {
-      alert('Todo deletion failed')
+      alert('Note deletion failed')
     }
   }
 
   async componentDidMount() {
     try {
-      const todos = await getTodos(this.props.auth.getIdToken())
+      const notes = await getNotes(this.props.auth.getIdToken())
       this.setState({
-        todos,
-        loadingTodos: false
+        notes,
+        loadingNotes: false
       })
     } catch (e) {
       if (e instanceof Error) {
-        alert(`Failed to fetch todos: ${e.message}`)
+        alert(`Failed to fetch notes: ${e.message}`)
     }
     }
   }
@@ -108,14 +108,14 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
       <div>
         <Header as="h1">NOTEs</Header>
 
-        {this.renderCreateTodoInput()}
+        {this.renderCreateNoteInput()}
 
-        {this.renderTodos()}
+        {this.renderNotes()}
       </div>
     )
   }
 
-  renderCreateTodoInput() {
+  renderCreateNoteInput() {
     return (
       <Grid.Row>
         <Grid.Column width={16}>
@@ -124,8 +124,8 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
               color: 'teal',
               labelPosition: 'left',
               icon: 'add',
-              content: 'New task',
-              onClick: this.onTodoCreate
+              content: 'New Note',
+              onClick: this.onNoteCreate
             }}
             fluid
             actionPosition="left"
@@ -140,12 +140,12 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     )
   }
 
-  renderTodos() {
-    if (this.state.loadingTodos) {
+  renderNotes() {
+    if (this.state.loadingNotes) {
       return this.renderLoading()
     }
 
-    return this.renderTodosList()
+    return this.renderNotesList()
   }
 
   renderLoading() {
@@ -158,29 +158,29 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
     )
   }
 
-  renderTodosList() {
+  renderNotesList() {
     return (
       <Grid padded>
-        {this.state.todos.map((todo, pos) => {
+        {this.state.notes.map((note, pos) => {
           return (
-            <Grid.Row key={todo.todoId}>
+            <Grid.Row key={note.noteId}>
               <Grid.Column width={1} verticalAlign="middle">
                 <Checkbox
-                  onChange={() => this.onTodoCheck(pos)}
-                  checked={todo.done}
+                  onChange={() => this.onNoteCheck(pos)}
+                  checked={note.done}
                 />
               </Grid.Column>
               <Grid.Column width={10} verticalAlign="middle">
-                {todo.name}
+                {note.name}
               </Grid.Column>
               <Grid.Column width={3} floated="right">
-                {todo.dueDate}
+                {note.dueDate}
               </Grid.Column>
               <Grid.Column width={1} floated="right">
                 <Button
                   icon
                   color="blue"
-                  onClick={() => this.onEditButtonClick(todo.todoId)}
+                  onClick={() => this.onEditButtonClick(note.noteId)}
                 >
                   <Icon name="pencil" />
                 </Button>
@@ -189,13 +189,13 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
                 <Button
                   icon
                   color="red"
-                  onClick={() => this.onTodoDelete(todo.todoId)}
+                  onClick={() => this.onNoteDelete(note.noteId)}
                 >
                   <Icon name="delete" />
                 </Button>
               </Grid.Column>
-              {todo.attachmentUrl && (
-                <Image src={todo.attachmentUrl} size="small" wrapped />
+              {note.attachmentUrl && (
+                <Image src={note.attachmentUrl} size="small" wrapped />
               )}
               <Grid.Column width={16}>
                 <Divider />

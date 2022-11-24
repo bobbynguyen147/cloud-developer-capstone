@@ -1,6 +1,6 @@
 import * as AWS from 'aws-sdk'
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
-import { createLogger } from '../../utils/logger'
+import { createLogger } from '../utils/logger'
 const AWSXRay = require('aws-xray-sdk');
 
 const XAWS = AWSXRay.captureAWS(AWS)
@@ -12,17 +12,17 @@ export class AttachmentUtils {
 
   constructor(
     private readonly docClient: DocumentClient = createDynamoDBClient(),
-    private readonly todosTable = process.env.TODOS_TABLE
+    private readonly notesTable = process.env.NOTES_TABLE
   ) {
   }
 
-  async updateAttachmentUrl(todoId: string, userId: string, url: string): Promise<string> {
-    logger.info('Update attachment url of todo')
+  async updateAttachmentUrl(noteId: string, userId: string, url: string): Promise<string> {
+    logger.info('Update attachment url of note')
 
     await this.docClient.update({
-      TableName: this.todosTable,
+      TableName: this.notesTable,
       Key: {
-        todoId: todoId,
+        noteId: noteId,
         userId: userId
       },
       UpdateExpression: "set attachmentUrl = :url",
