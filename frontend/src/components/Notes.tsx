@@ -129,7 +129,7 @@ export class Notes extends React.PureComponent<NotesProps, NotesState> {
             }}
             fluid
             actionPosition="left"
-            placeholder="To change the world..."
+            placeholder="Enter at least 3 characters..."
             onChange={this.handleNameChange}
           />
         </Grid.Column>
