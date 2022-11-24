@@ -1,7 +1,6 @@
 # cloud-developer-capstone
 
-This project using to add the Note, help people manage the task need to do daily.
-
+This project is used to add the Note, helping people manage the task need to do daily.
 ## Project Overview
 
 In this project I have implemented all the knowledge that I have learnt from the Udacity Cloud Developer program. In this project I have
