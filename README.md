@@ -1,6 +1,6 @@
 # cloud-developer-capstone
 
-This is final project of Udacity Cloud Developer Program.
+This project using to add the Note, help people manage the task need to do daily.
 
 ## Project Overview
 
